@@ -1,0 +1,21 @@
+/* Резервная тёплая палитра DobroHub — чтобы вернуть, замените блок :root в style.css на этот:
+
+:root {
+    --ink: #3a3028;
+    --muted: #6f6259;
+    --line: #e8cdb8;
+    --sand: #fff2e8;
+    --paper: #fffcfb;
+    --pine: #c17a10;
+    --pine-dark: #8c5810;
+    --ember: #d4623c;
+    --ember-soft: #ffd4c4;
+    --accent-warm: #e9c040;
+    --peach-soft: #ffeadd;
+    --sun-tint: rgba(233, 192, 64, 0.18);
+    --warn-bg: #fff8ea;
+    --warn-border: #f0dcb0;
+    --shadow: 0 10px 36px rgba(120, 72, 40, 0.09);
+}
+
+*/

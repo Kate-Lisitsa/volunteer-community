@@ -1,0 +1,120 @@
+// DobroHub — VolunteerCommunity (типы после уменьшения полей)
+// Сайт: https://dbdiagram.io → New diagram → Import → DBML (вставить этот файл)
+
+Table Users [note: 'Пользователи'] {
+  UserID integer [pk, increment]
+  Email varchar(255) [not null]
+  PasswordHash varchar(200) [not null]
+  FullName varchar(255) [not null]
+  Phone varchar(50)
+  BirthDate date
+  AvatarPath varchar(200)
+  Role varchar(20) [not null]
+  RegisteredAt datetime [not null]
+  IsActive boolean [not null]
+}
+
+Table Categories [note: 'Категории'] {
+  CategoryID integer [pk, increment]
+  CategoryName varchar(120) [not null]
+  Description varchar(200)
+  IsActive boolean [not null]
+}
+
+Table Events [note: 'Акции'] {
+  EventID integer [pk, increment]
+  Title varchar(255) [not null]
+  Description varchar(max) [not null]
+  CategoryID integer
+  CreatorUserID integer [not null]
+  EventDate datetime [not null]
+  Location varchar(200) [not null]
+  MaxParticipants integer
+  CreatedAt datetime [not null]
+  IsPublished boolean [not null]
+  ModerationStatus varchar(20) [not null]
+  RejectionReason varchar(max)
+  IsPriority boolean [not null]
+  CoverImagePath varchar(200)
+}
+
+Table Registrations [note: 'Регистрации'] {
+  RegistrationID integer [pk, increment]
+  EventID integer [not null]
+  UserID integer [not null]
+  RegisteredAt datetime [not null]
+  Status varchar(20) [not null]
+  ReminderSent boolean [not null]
+}
+
+Table News [note: 'Новости'] {
+  NewsID integer [pk, increment]
+  Title varchar(200) [not null]
+  Summary varchar(200)
+  BodyHtml varchar(max) [not null]
+  RelatedEventID integer
+  CategoryID integer
+  IsPublished boolean [not null]
+  PublishedAt datetime
+  AuthorUserID integer
+  CreatedAt datetime [not null]
+}
+
+Table NewsImages [note: 'Изображения новостей'] {
+  ImageID integer [pk, increment]
+  NewsID integer [not null]
+  FilePath varchar(200) [not null]
+  SortOrder integer [not null]
+}
+
+Table EventMaterials [note: 'Материалы акции'] {
+  MaterialID integer [pk, increment]
+  EventID integer [not null]
+  UserID integer [not null]
+  MaterialType varchar(20) [not null]
+  TextContent varchar(max)
+  FilePath varchar(200)
+  OriginalName varchar(200)
+  CreatedAt datetime [not null]
+}
+
+Table EventOutcomes [note: 'Итоги акции'] {
+  OutcomeID integer [pk, increment]
+  EventID integer [not null, unique]
+  BodyText varchar(max)
+  SubmittedAt datetime [not null]
+  UpdatedAt datetime
+}
+
+Table EventOutcomeFiles [note: 'Файлы итогов акции'] {
+  FileID integer [pk, increment]
+  OutcomeID integer [not null]
+  MaterialType varchar(20) [not null]
+  FilePath varchar(500) [not null]
+  OriginalName varchar(255)
+  CreatedAt datetime [not null]
+}
+
+Table ActivityLog [note: 'Журнал действий'] {
+  LogID integer [pk, increment]
+  UserID integer [not null]
+  EventID integer
+  ActionType varchar(50) [not null]
+  ActionDate datetime [not null]
+  Details varchar(200)
+}
+
+Ref: Events.CategoryID > Categories.CategoryID
+Ref: Events.CreatorUserID > Users.UserID
+Ref: Registrations.EventID > Events.EventID
+Ref: Registrations.UserID > Users.UserID
+Ref: News.RelatedEventID > Events.EventID
+Ref: News.AuthorUserID > Users.UserID
+Ref: News.CategoryID > Categories.CategoryID
+Ref: NewsImages.NewsID > News.NewsID
+Ref: EventMaterials.EventID > Events.EventID
+Ref: EventMaterials.UserID > Users.UserID
+Ref: EventOutcomes.EventID > Events.EventID
+Ref: EventOutcomeFiles.OutcomeID > EventOutcomes.OutcomeID
+Ref: ActivityLog.UserID > Users.UserID
+Ref: ActivityLog.EventID > Events.EventID

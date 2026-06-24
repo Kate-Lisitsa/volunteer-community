@@ -1,0 +1,201 @@
+<?php
+require_once __DIR__ . '/config.php';
+
+/**
+ * От кого уходят письма: если в config оставлен placeholder noreply@localhost (или пусто),
+ * подставляется первый активный админ из Users (Email + FullName).
+ *
+ * @return array{address:string, name:string}
+ */
+function resolveMailFromIdentity() {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $addr = trim((string)MAIL_FROM_ADDRESS);
+    $name = (string)MAIL_FROM_NAME;
+
+    $placeholder = ($addr === '' || strcasecmp($addr, 'noreply@localhost') === 0);
+    if ($placeholder) {
+        if (!class_exists('Database', false)) {
+            require_once __DIR__ . '/db_connect.php';
+        }
+        try {
+            $db = Database::getInstance();
+            $stmt = $db->query(
+                "SELECT TOP 1 Email, FullName FROM Users WHERE Role = N'admin' AND IsActive = 1 ORDER BY UserID"
+            );
+            $row = $db->fetchOne($stmt);
+            if ($row && !empty($row['Email'])) {
+                $email = trim((string)$row['Email']);
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $addr = $email;
+                    $fn = trim((string)($row['FullName'] ?? ''));
+                    if ($fn !== '') {
+                        $name = $fn;
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            error_log('resolveMailFromIdentity: ' . $e->getMessage());
+        }
+    }
+
+    if ($addr === '') {
+        $addr = 'noreply@localhost';
+    }
+
+    $cached = ['address' => $addr, 'name' => $name];
+    return $cached;
+}
+
+/**
+ * Детальный результат отправки (для админ-проверки и диагностики).
+ *
+ * @return array{ok:bool, error:?string, via:string}
+ */
+function sendRawEmailReport($to, $subject, $bodyText) {
+    if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        return ['ok' => false, 'error' => 'Некорректный адрес получателя.', 'via' => 'none'];
+    }
+
+    $autoload = dirname(__DIR__) . '/vendor/autoload.php';
+    if (MAIL_SMTP_HOST !== '') {
+        if (!is_readable($autoload)) {
+            return [
+                'ok' => false,
+                'error' => 'Заполнен MAIL_SMTP_HOST, но нет vendor/autoload.php. Выполните в корне проекта: composer install',
+                'via' => 'smtp',
+            ];
+        }
+        $ok = sendRawEmailSmtp($to, $subject, $bodyText, $autoload, $err);
+        return ['ok' => $ok, 'error' => $err, 'via' => 'smtp'];
+    }
+
+    $identity = resolveMailFromIdentity();
+    $from = $identity['address'];
+    $name = $identity['name'];
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-type: text/plain; charset=UTF-8',
+        'From: ' . sprintf('"%s" <%s>', encodeMailHeaderName($name), $from),
+    ];
+    $sent = @mail($to, encodeMailSubject($subject), $bodyText, implode("\r\n", $headers));
+    return [
+        'ok' => (bool)$sent,
+        'error' => $sent ? null : 'Функция mail() вернула false (часто на Windows локально не настроена). Задайте SMTP в config.php.',
+        'via' => 'mail',
+    ];
+}
+
+/**
+ * Отправка plain-text письма. При заполненном MAIL_SMTP_HOST — через PHPMailer/SMTP (предпочтительно).
+ */
+function sendRawEmail($to, $subject, $bodyText) {
+    $r = sendRawEmailReport($to, $subject, $bodyText);
+    return $r['ok'];
+}
+
+function encodeMailSubject($subject) {
+    return '=?UTF-8?B?' . base64_encode($subject) . '?=';
+}
+
+function encodeMailHeaderName($name) {
+    if (preg_match('/[\x80-\xFF]/', $name)) {
+        return '=?UTF-8?B?' . base64_encode($name) . '?=';
+    }
+    return $name;
+}
+
+/**
+ * @param string|null $errorOut сообщение об ошибке при неуспехе
+ * @return bool
+ */
+function sendRawEmailSmtp($to, $subject, $bodyText, $autoloadPath, &$errorOut = null) {
+    $errorOut = null;
+    require_once $autoloadPath;
+
+    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+        $mail->CharSet = \PHPMailer\PHPMailer\PHPMailer::CHARSET_UTF8;
+        $mail->isSMTP();
+        $mail->Host = MAIL_SMTP_HOST;
+        $mail->SMTPAuth = true;
+        $identity = resolveMailFromIdentity();
+        $mail->Username = (MAIL_SMTP_USER !== '') ? MAIL_SMTP_USER : $identity['address'];
+        $mail->Password = MAIL_SMTP_PASS;
+        $mail->Port = (int)MAIL_SMTP_PORT;
+
+        $sec = strtolower((string)MAIL_SMTP_SECURE);
+        if ($sec === 'ssl') {
+            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        } elseif ($sec === 'tls') {
+            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        }
+
+        $mail->setFrom($identity['address'], $identity['name']);
+        $mail->addAddress($to);
+        $mail->Subject = $subject;
+        $mail->Body = $bodyText;
+
+        $mail->send();
+        return true;
+    } catch (\Throwable $e) {
+        $errorOut = $e->getMessage();
+        error_log('DobroHub mail SMTP: ' . $errorOut);
+        return false;
+    }
+}
+
+/**
+ * Подтверждение записи на акцию (отправляется сразу после регистрации).
+ *
+ * @param mixed $eventDateRaw сырое значение EventDate — для текста про напоминание
+ */
+function sendEventRegistrationEmail($userEmail, $userName, $eventTitle, $eventDateFormatted, $eventLocation, $eventId, $categoryName = '', $eventDateRaw = null) {
+    if ($eventDateRaw !== null && !function_exists('registrationReminderNoticeText')) {
+        require_once __DIR__ . '/event_reminders.php';
+    }
+    $subject = 'Вы записаны на акцию «' . $eventTitle . '»';
+    $link = rtrim(APP_URL, '/') . '/pages/event_details.php?id=' . (int)$eventId;
+    $body = "Здравствуйте, {$userName}!\r\n\r\n";
+    $body .= "Вы успешно записались на волонтёрскую акцию.\r\n\r\n";
+    $body .= "«{$eventTitle}»\r\n";
+    if ($categoryName !== '') {
+        $body .= "Категория: {$categoryName}\r\n";
+    }
+    $body .= "Когда: {$eventDateFormatted}\r\n";
+    $body .= "Место: {$eventLocation}\r\n\r\n";
+    $body .= "Карточка акции на сайте:\r\n{$link}\r\n\r\n";
+    if ($eventDateRaw !== null) {
+        $reminderNote = registrationReminderNoticeText($eventDateRaw);
+        if ($reminderNote !== null) {
+            $body .= $reminderNote . "\r\n\r\n";
+        }
+    }
+    $body .= "С уважением,\r\n" . APP_NAME . "\r\n";
+    return sendRawEmail($userEmail, $subject, $body);
+}
+
+/**
+ * Напоминание за сутки до акции (текст письма).
+ *
+ * @param int $eventId для ссылки на карточку
+ */
+function sendEventReminderEmail($userEmail, $userName, $eventTitle, $eventDateFormatted, $eventLocation, $eventId, $categoryName = '') {
+    $subject = 'Напоминание: завтра акция «' . $eventTitle . '»';
+    $link = rtrim(APP_URL, '/') . '/pages/event_details.php?id=' . (int)$eventId;
+    $body = "Здравствуйте, {$userName}!\r\n\r\n";
+    $body .= "Завтра состоится акция, на которую вы записаны.\r\n\r\n";
+    $body .= "«{$eventTitle}»\r\n";
+    if ($categoryName !== '') {
+        $body .= "Категория: {$categoryName}\r\n";
+    }
+    $body .= "Когда: {$eventDateFormatted}\r\n";
+    $body .= "Место: {$eventLocation}\r\n\r\n";
+    $body .= "Карточка на сайте:\r\n{$link}\r\n\r\n";
+    $body .= "С уважением,\r\n" . APP_NAME . "\r\n";
+    return sendRawEmail($userEmail, $subject, $body);
+}

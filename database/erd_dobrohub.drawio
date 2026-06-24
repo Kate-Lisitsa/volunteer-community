@@ -1,0 +1,140 @@
+<mxfile host="app.diagrams.net" modified="2026-06-08T16:00:00.000Z" agent="DobroHub" version="22.1.0">
+  <diagram id="erd-exact" name="ERD — точно как в SSMS">
+    <mxGraphModel dx="1500" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Таблицы (русские названия, # = естественный ключ) -->
+
+        <mxCell id="t_users" value="&lt;b&gt;Пользователь&lt;/b&gt;&lt;br&gt;# электронная почта&lt;br&gt;пароль&lt;br&gt;ФИО&lt;br&gt;телефон&lt;br&gt;дата рождения&lt;br&gt;путь к аватару&lt;br&gt;роль&lt;br&gt;дата регистрации&lt;br&gt;активен" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="280" width="200" height="155" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_activitylog" value="&lt;b&gt;Журнал действий&lt;/b&gt;&lt;br&gt;# дата и время действия&lt;br&gt;тип действия&lt;br&gt;детали&lt;br&gt;&lt;i&gt;пользователь — связь&lt;/i&gt;&lt;br&gt;&lt;i&gt;акция — связь (необяз.)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="80" y="300" width="200" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_newsimages" value="&lt;b&gt;Изображение новости&lt;/b&gt;&lt;br&gt;# путь к файлу&lt;br&gt;# заголовок новости&lt;br&gt;порядок отображения" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="40" width="200" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_news" value="&lt;b&gt;Новость&lt;/b&gt;&lt;br&gt;# заголовок новости&lt;br&gt;краткое описание&lt;br&gt;текст новости (HTML)&lt;br&gt;дата публикации&lt;br&gt;дата создания&lt;br&gt;опубликована&lt;br&gt;&lt;i&gt;автор — связь с Пользователем&lt;/i&gt;&lt;br&gt;&lt;i&gt;связанная акция — связь с Акцией&lt;/i&gt;&lt;br&gt;&lt;i&gt;категория — связь с Категорией&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="220" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_registrations" value="&lt;b&gt;Регистрация&lt;/b&gt;&lt;br&gt;# электронная почта&lt;br&gt;# название акции&lt;br&gt;дата регистрации&lt;br&gt;статус участия&lt;br&gt;напоминание отправлено" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="320" y="520" width="200" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_categories" value="&lt;b&gt;Категория&lt;/b&gt;&lt;br&gt;# название категории&lt;br&gt;описание" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="600" y="40" width="200" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_events" value="&lt;b&gt;Акция&lt;/b&gt;&lt;br&gt;# название акции&lt;br&gt;# дата и время проведения&lt;br&gt;описание&lt;br&gt;место проведения&lt;br&gt;лимит участников&lt;br&gt;дата создания&lt;br&gt;опубликована&lt;br&gt;статус модерации&lt;br&gt;причина отклонения&lt;br&gt;приоритетная&lt;br&gt;путь к обложке" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="560" y="200" width="220" height="175" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_eventmaterials" value="&lt;b&gt;Материал акции&lt;/b&gt;&lt;br&gt;# путь к файлу&lt;br&gt;тип материала&lt;br&gt;текст материала&lt;br&gt;оригинальное имя&lt;br&gt;дата загрузки" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="560" y="520" width="220" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_eventoutcomes" value="&lt;b&gt;Итоги акции&lt;/b&gt;&lt;br&gt;# название акции&lt;br&gt;текст отчёта&lt;br&gt;дата подачи&lt;br&gt;дата обновления" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="860" y="280" width="200" height="85" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_eventoutcomefiles" value="&lt;b&gt;Файл итогов акции&lt;/b&gt;&lt;br&gt;# путь к файлу&lt;br&gt;# название акции&lt;br&gt;тип материала&lt;br&gt;оригинальное имя&lt;br&gt;дата загрузки" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="280" width="200" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- === 13 связей — ТОЧЬ В ТОЧЬ как в SSMS === -->
+
+        <!-- 1. Пользователь 1:N Журнал действий -->
+        <mxCell id="e01" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;" edge="1" parent="1" source="t_users" target="t_activitylog">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 2. Пользователь 1:N Новость (автор) — ОДНА связь -->
+        <mxCell id="e02" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_users" target="t_news">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="300" y="355"/><mxPoint x="300" y="188"/></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 3. Пользователь 1:N Регистрация -->
+        <mxCell id="e03" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;" edge="1" parent="1" source="t_users" target="t_registrations">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 4. Пользователь 1:N Акция (организатор) -->
+        <mxCell id="e04" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;" edge="1" parent="1" source="t_users" target="t_events">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 5. Пользователь 1:N Материал акции -->
+        <mxCell id="e05" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_users" target="t_eventmaterials">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="420" y="480"/><mxPoint x="650" y="480"/></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 6. Акция 1:N Журнал действий -->
+        <mxCell id="e06" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_events" target="t_activitylog">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="520" y="240"/><mxPoint x="180" y="240"/></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 7. Акция 1:N Регистрация -->
+        <mxCell id="e07" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;" edge="1" parent="1" source="t_events" target="t_registrations">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 8. Акция 1:N Новость (связанная акция) — ОДНА связь с Новостью -->
+        <mxCell id="e08" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_events" target="t_news">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="520" y="180"/><mxPoint x="280" y="180"/></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 9. Акция 1:N Материал акции -->
+        <mxCell id="e09" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;" edge="1" parent="1" source="t_events" target="t_eventmaterials">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 10. Акция 1:1 Итоги акции (UNIQUE EventID в БД) -->
+        <mxCell id="e10" style="endArrow=ERone;endFill=0;startArrow=ERone;startFill=0;startSize=10;endSize=10;html=1;" edge="1" parent="1" source="t_events" target="t_eventoutcomes">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10t" value="1 : 1" style="text;html=1;fillColor=#ffe6cc;" vertex="1" connectable="0" parent="e10"><mxGeometry relative="1" as="geometry"><mxPoint x="-0.1" as="offset"/></mxGeometry></mxCell>
+
+        <!-- 11. Категория 1:N Акция -->
+        <mxCell id="e11" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;" edge="1" parent="1" source="t_categories" target="t_events">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 12. Категория 1:N Новость -->
+        <mxCell id="e11b" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="t_categories" target="t_news">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="520" y="68"/><mxPoint x="520" y="155"/><mxPoint x="280" y="155"/></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 13. Новость 1:N Изображение новости -->
+        <mxCell id="e12" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;" edge="1" parent="1" source="t_news" target="t_newsimages">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 14. Итоги акции 1:N Файл итогов акции -->
+        <mxCell id="e13" style="endArrow=block;endFill=1;startArrow=ERone;startFill=0;endSize=10;html=1;" edge="1" parent="1" source="t_eventoutcomes" target="t_eventoutcomefiles">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="note" value="&lt;b&gt;14 связей — как в БД (FK)&lt;/b&gt;&lt;br&gt;13 × 1:N + Акция↔Итоги = &lt;b&gt;1:1&lt;/b&gt;&lt;br&gt;# — естественный ключ" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="860" y="40" width="440" height="70" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
